@@ -1,0 +1,394 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 160rpx);
+}
+
+.matchHeader {
+  margin: $spacing-md $page-padding 0;
+  padding: $spacing-xl $spacing-lg;
+  background: linear-gradient(135deg, $color-primary 0%, #7C92F8 50%, $color-secondary 100%);
+  border-radius: $radius-lg;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.15) 0%, transparent 50%);
+  }
+}
+
+.scoreDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.scoreRing {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: $spacing-md;
+}
+
+.ringOuter {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    #FFD166 0% 25%,
+    #06D6A0 25% 50%,
+    #4F6CF5 50% 75%,
+    #FF8C42 75% 100%
+  );
+  padding: 12rpx;
+}
+
+.ringInner {
+  width: 100%;
+  height: 100%;
+  background: $color-bg-card;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+}
+
+.scoreValue {
+  font-size: 56rpx;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  line-height: 1;
+}
+
+.scoreLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-semibold;
+}
+
+.scoreLabelMain {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: 8rpx;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-md;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-button;
+  backdrop-filter: blur(6rpx);
+}
+
+.statusIcon {
+  font-size: $font-size-md;
+}
+
+.statusText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.peopleCard {
+  margin: $spacing-md $page-padding 0;
+  padding: $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+
+.personRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md 0;
+}
+
+.personRow + .personRow {
+  border-top: 1rpx solid $color-divider;
+}
+
+.personAvatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: $radius-round;
+  background: rgba(79, 108, 245, 0.1);
+  flex-shrink: 0;
+  border: 3rpx solid rgba(79, 108, 245, 0.15);
+}
+
+.personInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.personName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.personRole {
+  padding: 2rpx 10rpx;
+  background: rgba(79, 108, 245, 0.1);
+  color: $color-primary;
+  border-radius: $radius-round;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.personRoleTeacher {
+  background: rgba(255, 140, 66, 0.1);
+  color: $color-secondary;
+}
+
+.personDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.interestIndicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+  flex-shrink: 0;
+}
+
+.heartIcon {
+  font-size: 40rpx;
+}
+
+.heartLabel {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-medium;
+}
+
+.vsConnector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm 0;
+  gap: $spacing-sm;
+}
+
+.vsLine {
+  flex: 1;
+  height: 1rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    $color-divider 0,
+    $color-divider 8rpx,
+    transparent 8rpx,
+    transparent 16rpx
+  );
+}
+
+.vsLabel {
+  padding: $spacing-xs $spacing-md;
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.scoreSection {
+  margin: $spacing-md $page-padding 0;
+  padding: $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-lg;
+}
+
+.sectionIcon {
+  font-size: $font-size-lg;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.dimItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md 0;
+}
+
+.dimItem + .dimItem {
+  border-top: 1rpx solid $color-divider;
+}
+
+.dimIcon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+
+.dimInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.dimHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+}
+
+.dimName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.dimScore {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 2rpx;
+}
+
+.dimWeight {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-medium;
+}
+
+.dimBar {
+  width: 100%;
+  height: 12rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-round;
+  overflow: hidden;
+}
+
+.dimFill {
+  height: 100%;
+  border-radius: $radius-round;
+  transition: width $transition-base ease;
+}
+
+.dimDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  line-height: 1.4;
+}
+
+.actionBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding calc(env(safe-area-inset-bottom) + $spacing-md);
+  background: $color-bg-card;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.ghostBtn {
+  flex: 1;
+  padding: $spacing-md;
+  border: 2rpx solid $color-border;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.ghostBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-secondary;
+  text-align: center;
+  display: block;
+}
+
+.successBtn {
+  flex: 2;
+  padding: $spacing-md;
+  background: linear-gradient(135deg, $color-success 0%, #6DD400 100%);
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.successBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+  text-align: center;
+  display: block;
+}
+
+.primaryBtn {
+  flex: 2;
+  padding: $spacing-md;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.primaryBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+  text-align: center;
+  display: block;
+}

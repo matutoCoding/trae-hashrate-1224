@@ -1,0 +1,334 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 160rpx);
+}
+
+.headerCard {
+  margin: $spacing-md $page-padding 0;
+  padding: $spacing-xl;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-lg;
+  color: $color-text-white;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -40rpx;
+    right: -40rpx;
+    width: 200rpx;
+    height: 200rpx;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+  }
+}
+
+.headerTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+  position: relative;
+  z-index: 1;
+}
+
+.courseBadge {
+  padding: $spacing-xs $spacing-md;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  backdrop-filter: blur(6rpx);
+}
+
+.statusBadge {
+  padding: $spacing-xs $spacing-md;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  backdrop-filter: blur(6rpx);
+}
+
+.courseName {
+  font-size: 48rpx;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+  margin-bottom: $spacing-md;
+  position: relative;
+  z-index: 1;
+}
+
+.dateTime {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  position: relative;
+  z-index: 1;
+}
+
+.dateRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-size-md;
+  opacity: 0.95;
+}
+
+.infoSection {
+  margin: $spacing-md $page-padding 0;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-tertiary;
+  padding: $spacing-lg $spacing-lg $spacing-sm;
+  text-transform: uppercase;
+  letter-spacing: 2rpx;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-lg;
+  gap: $spacing-md;
+}
+
+.infoItemLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex: 1;
+  min-width: 0;
+}
+
+.infoIcon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-md;
+  background: rgba(79, 108, 245, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+
+.infoLabel {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.infoValue {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  flex-shrink: 0;
+}
+
+.divider {
+  height: 1rpx;
+  background: $color-divider;
+  margin: 0 $spacing-lg;
+}
+
+.progressBox {
+  padding: $spacing-md $spacing-lg $spacing-lg;
+}
+
+.progressHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.progressLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.progressValue {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-bold;
+}
+
+.progressBar {
+  width: 100%;
+  height: 16rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-round;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-round;
+  transition: width $transition-base ease;
+}
+
+.studentList {
+  padding: 0 $spacing-lg $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.studentItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+}
+
+.studentAvatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+  background: rgba(79, 108, 245, 0.15);
+}
+
+.studentInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.studentName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.studentLevel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+}
+
+.studentTag {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-round;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.teacherBox {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg $spacing-lg;
+}
+
+.teacherAvatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+  background: rgba(255, 140, 66, 0.15);
+  border: 3rpx solid rgba(255, 140, 66, 0.2);
+}
+
+.teacherInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.teacherName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.teacherMajor {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.teacherRate {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: $font-size-xs;
+  color: #FFB547;
+  font-weight: $font-weight-semibold;
+}
+
+.actionBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding calc(env(safe-area-inset-bottom) + $spacing-md);
+  background: $color-bg-card;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.secondaryBtn {
+  flex: 1;
+  padding: $spacing-md;
+  background: $color-bg-hover;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &:active {
+    background: $color-divider;
+  }
+}
+
+.secondaryBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-secondary;
+  text-align: center;
+  display: block;
+}
+
+.primaryBtn {
+  flex: 2;
+  padding: $spacing-md;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.primaryBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+  text-align: center;
+  display: block;
+}

@@ -1,0 +1,97 @@
+@use '@/styles/variables.scss' as *;
+
+.card,
+.twoColCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.image {
+  width: 100%;
+  background: $color-bg-hover;
+  display: block;
+}
+
+.overlay {
+  position: absolute;
+  top: $spacing-sm;
+  left: $spacing-sm;
+  z-index: 2;
+}
+
+.tag {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6rpx 16rpx;
+  border-radius: $radius-round;
+  backdrop-filter: blur(10rpx);
+}
+
+.content {
+  padding: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.title {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  line-height: $line-height-tight;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.authorAvatar {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  flex-shrink: 0;
+}
+
+.authorName {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  padding-top: $spacing-sm;
+  border-top: 1rpx solid $color-divider;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.actionIcon {
+  font-size: $font-size-sm;
+  line-height: 1;
+}
+
+.actionCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

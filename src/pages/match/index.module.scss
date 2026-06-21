@@ -1,0 +1,245 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 40rpx);
+}
+
+.statsHeader {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: calc(env(safe-area-inset-top) + 32rpx) $page-padding 56rpx;
+  border-radius: 0 0 48rpx 48rpx;
+  position: relative;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-md;
+  margin-top: $spacing-md;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  padding: $spacing-md $spacing-xs;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: $radius-lg;
+  backdrop-filter: blur(10rpx);
+}
+
+.statValue {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  line-height: $line-height-tight;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+}
+
+.tabs {
+  display: flex;
+  background: $color-bg-card;
+  padding: $spacing-sm $page-padding;
+  gap: $spacing-md;
+  margin: -32rpx $page-padding 0;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  position: relative;
+  z-index: 10;
+}
+
+.tab {
+  flex: 1;
+  padding: $spacing-sm;
+  border-radius: $radius-md;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  text-align: center;
+  transition: all $transition-base;
+}
+
+.tabActive {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+}
+
+.content {
+  padding: $spacing-md $page-padding 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: $spacing-md 0 $spacing-lg;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.titleIcon {
+  font-size: $font-size-lg;
+  line-height: 1;
+}
+
+.badgeCount {
+  background: $color-error;
+  color: $color-text-white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  padding: 2rpx 12rpx;
+  border-radius: $radius-round;
+  margin-left: $spacing-xs;
+}
+
+.matchList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.intentCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  border: 2rpx dashed $color-border;
+}
+
+.intentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.intentTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.intentSwitch {
+  display: flex;
+  background: $color-bg-hover;
+  border-radius: $radius-button;
+  padding: 4rpx;
+}
+
+.switchOption {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+}
+
+.switchOptionActive {
+  background: $color-bg-card;
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+}
+
+.personList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.personRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+}
+
+.personAvatar {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: $radius-round;
+  background: $color-bg-card;
+  flex-shrink: 0;
+}
+
+.personInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.personName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.personDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+}
+
+.personTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6rpx;
+  margin-top: $spacing-xs;
+}
+
+.personTag {
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: $radius-xs;
+  background: rgba(79, 108, 245, 0.1);
+  color: $color-primary;
+}
+
+.selectBtn {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-button;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+  flex-shrink: 0;
+}
+
+.selectBtnSelected {
+  background: linear-gradient(135deg, $color-success 0%, #30D158 100%);
+  border-color: transparent;
+}
+
+.selectBtnText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+}
+
+.selectBtnTextSelected {
+  color: $color-text-white;
+}

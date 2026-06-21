@@ -1,0 +1,308 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 40rpx;
+}
+
+.hero {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 60%, #9EB3FF 100%);
+  padding: calc(env(safe-area-inset-top) + 40rpx) $page-padding 60rpx;
+  border-radius: 0 0 48rpx 48rpx;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -100rpx;
+    right: -80rpx;
+    width: 280rpx;
+    height: 280rpx;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -60rpx;
+    left: -40rpx;
+    width: 180rpx;
+    height: 180rpx;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+  }
+}
+
+.heroTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xl;
+  position: relative;
+  z-index: 1;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex: 1;
+  min-width: 0;
+}
+
+.avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.3);
+  border: 4rpx solid rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.userText {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  min-width: 0;
+}
+
+.greeting {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  line-height: $line-height-tight;
+}
+
+.subGreeting {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+  @include text-ellipsis;
+}
+
+.roleTag {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-md;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-button;
+  backdrop-filter: blur(10rpx);
+}
+
+.roleText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.heroStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+  position: relative;
+  z-index: 1;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  padding: $spacing-md $spacing-sm;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: $radius-lg;
+  backdrop-filter: blur(10rpx);
+}
+
+.statValue {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  line-height: $line-height-tight;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.content {
+  padding: 0 $page-padding;
+  margin-top: -32rpx;
+  position: relative;
+  z-index: 2;
+}
+
+.quickSection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.titleIcon {
+  font-size: $font-size-lg;
+  line-height: 1;
+}
+
+.sectionMore {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.todaySection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.todayHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.todayDate {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.todaySchedule {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.matchTeaser {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  border: 2rpx solid rgba(52, 199, 89, 0.15);
+  background: linear-gradient(180deg, rgba(52, 199, 89, 0.04) 0%, $color-bg-card 50%);
+}
+
+.matchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  margin-top: $spacing-md;
+}
+
+.matchPersons {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex: 1;
+  min-width: 0;
+}
+
+.matchAvatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+  background: $color-bg-card;
+  flex-shrink: 0;
+}
+
+.matchNames {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.matchName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.matchDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.matchScoreBadge {
+  padding: $spacing-xs $spacing-md;
+  background: linear-gradient(135deg, $color-success 0%, #30D158 100%);
+  border-radius: $radius-button;
+  flex-shrink: 0;
+}
+
+.matchScore {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.gallerySection {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.galleryPreview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+}
+
+.galleryImg {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: $radius-md;
+  background: $color-bg-hover;
+}
+
+.emptyToday {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 0;
+  gap: $spacing-sm;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

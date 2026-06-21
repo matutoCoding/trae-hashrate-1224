@@ -1,0 +1,78 @@
+@use '@/styles/compat.scss';
+@use '@/styles/variables.scss' as *;
+
+// 全局样式
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB',
+    sans-serif;
+  font-size: $font-size-md;
+  line-height: $line-height-normal;
+  color: $color-text-primary;
+  background-color: $color-bg-page;
+}
+
+// 通用容器
+.page-container {
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+  box-sizing: border-box;
+}
+
+.page-content {
+  padding: 0 $page-padding;
+}
+
+// 渐变背景工具类
+.gradient-bg-primary {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+}
+
+.gradient-bg-secondary {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-light 100%);
+}
+
+// 卡片通用样式
+.card-base {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: 0 2rpx 16rpx rgba(79, 108, 245, 0.08);
+}
+
+// flex 工具
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+// 文字截断
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 安全底部间距
+.safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 20rpx);
+}

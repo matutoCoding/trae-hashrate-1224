@@ -1,0 +1,213 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+  position: relative;
+  overflow: hidden;
+
+  &:active {
+    transform: translateY(2rpx);
+  }
+}
+
+.mutualCard {
+  border: 2rpx solid rgba(52, 199, 89, 0.3);
+  background: linear-gradient(180deg, rgba(52, 199, 89, 0.05) 0%, $color-bg-card 30%);
+}
+
+.mutualBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, $color-success 0%, #30D158 100%);
+  padding: $spacing-xs $spacing-md;
+  border-radius: 0 $radius-lg 0 $radius-lg;
+}
+
+.mutualText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.persons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+  padding-top: 0;
+}
+
+.mutualCard .persons {
+  padding-top: $spacing-lg;
+}
+
+.person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+  flex: 1;
+  max-width: 40%;
+}
+
+.avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  border: 4rpx solid $color-bg-card;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.personInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rpx;
+}
+
+.name {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  max-width: 180rpx;
+}
+
+.role {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  background: $color-divider;
+  padding: 2rpx 10rpx;
+  border-radius: $radius-round;
+}
+
+.interestIcon {
+  font-size: $font-size-lg;
+  color: $color-text-disabled;
+  margin-top: 4rpx;
+}
+
+.interested {
+  color: $color-error;
+}
+
+.connect {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  flex-shrink: 0;
+  padding-bottom: 40rpx;
+}
+
+.arrowLine {
+  width: 24rpx;
+  height: 2rpx;
+  background: $color-border;
+}
+
+.arrowIcon {
+  font-size: $font-size-lg;
+  color: $color-primary;
+  font-weight: $font-weight-bold;
+}
+
+.scoreSection {
+  display: flex;
+  gap: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.scoreCircle {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: $radius-round;
+  border: 6rpx solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: $color-bg-page;
+}
+
+.scoreNum {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  line-height: 1.1;
+}
+
+.scoreLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.scoreDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  min-width: 0;
+}
+
+.scoreTag {
+  align-self: flex-start;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-round;
+}
+
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.breakItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.breakLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  width: 100rpx;
+  flex-shrink: 0;
+}
+
+.breakBar {
+  flex: 1;
+  height: 8rpx;
+  background: $color-divider;
+  border-radius: $radius-round;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.breakFill {
+  height: 100%;
+  border-radius: $radius-round;
+  transition: width $transition-base;
+}
+
+.breakVal {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  width: 48rpx;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.matchTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

@@ -1,0 +1,56 @@
+@use '@/styles/variables.scss' as *;
+
+.header {
+  background: $color-bg-card;
+  padding: $spacing-lg $page-padding $spacing-md;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 88rpx;
+}
+
+.leftArea {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: $spacing-sm;
+}
+
+.backIcon {
+  font-size: 40rpx;
+  color: $color-primary;
+  font-weight: 600;
+  padding-right: $spacing-sm;
+}
+
+.titleWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.title {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  line-height: $line-height-tight;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  line-height: $line-height-tight;
+}
+
+.rightArea {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+}

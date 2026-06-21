@@ -1,0 +1,272 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 40rpx);
+}
+
+.hero {
+  background: linear-gradient(135deg, #9333EA 0%, #B473F0 50%, #D4B4FF 100%);
+  padding: calc(env(safe-area-inset-top) + 32rpx) $page-padding 80rpx;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -100rpx;
+    left: -60rpx;
+    width: 300rpx;
+    height: 300rpx;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -40rpx;
+    right: -40rpx;
+    width: 200rpx;
+    height: 200rpx;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+  }
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  position: relative;
+  z-index: 1;
+}
+
+.avatar {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.3);
+  border: 6rpx solid rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+}
+
+.userInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.userName {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  line-height: $line-height-tight;
+  @include text-ellipsis;
+}
+
+.userDesc {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+  @include text-ellipsis;
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: $spacing-xs $spacing-md;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-button;
+  align-self: flex-start;
+  backdrop-filter: blur(10rpx);
+}
+
+.roleText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.editBtn {
+  padding: $spacing-xs $spacing-md;
+  border: 2rpx solid rgba(255, 255, 255, 0.4);
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &:active {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.editBtnText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.statsFloat {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-sm;
+  margin: -48rpx $page-padding 0;
+  padding: $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  position: relative;
+  z-index: 2;
+}
+
+.floatItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.floatValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: $line-height-tight;
+}
+
+.floatLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.content {
+  padding: $spacing-md $page-padding 0;
+}
+
+.section {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-sm 0;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-tertiary;
+  padding: $spacing-md $spacing-lg $spacing-sm;
+  text-transform: uppercase;
+  letter-spacing: 2rpx;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  transition: all $transition-base;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.menuIcon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-lg;
+  flex-shrink: 0;
+}
+
+.menuContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.menuLabel {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.menuDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+}
+
+.menuArrow {
+  font-size: $font-size-lg;
+  color: $color-text-disabled;
+  flex-shrink: 0;
+}
+
+.menuBadge {
+  padding: 2rpx 12rpx;
+  background: $color-error;
+  color: $color-text-white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+}
+
+.divider {
+  height: 1rpx;
+  background: $color-divider;
+  margin: 0 $spacing-lg;
+}
+
+.roleSwitch {
+  display: flex;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  gap: $spacing-md;
+}
+
+.roleOption {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+}
+
+.roleOptionActive {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(147, 51, 234, 0.05) 100%);
+  border-color: rgba(147, 51, 234, 0.3);
+}
+
+.roleIcon {
+  font-size: $font-size-xxl;
+  line-height: 1;
+}
+
+.roleName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.roleHint {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
