@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
@@ -7,11 +7,11 @@ import StudioCard from '@/components/StudioCard';
 import ScheduleItem from '@/components/ScheduleItem';
 import EmptyState from '@/components/EmptyState';
 import { cycleRuleList } from '@/data/schedules';
-import { scheduleList } from '@/data/schedules';
 import { studioList } from '@/data/studios';
 import { WEEKDAY_NAMES, generateScheduleDates } from '@/utils/date';
 import { getCourseTypeName } from '@/utils/score';
-import type { CycleRule, CourseType } from '@/types';
+import { useAppStore } from '@/store';
+import type { CycleRule, CourseType, Schedule } from '@/types';
 
 const typeColorMap: Record<string, { bg: string; color: string }> = {
   sketch: { bg: '#EEF1FF', color: '#4F6CF5' },
@@ -43,14 +43,24 @@ const SchedulePage: React.FC = () => {
   const [filterType, setFilterType] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
 
+  const schedules = useAppStore(s => s.schedules);
+  const addSchedules = useAppStore(s => s.addSchedules);
+  const scheduleIdSeq = useAppStore(s => s.scheduleIdSeq);
+  const updateIdSeq = useAppStore.setState;
+
   const onRefresh = () => {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 800);
   };
 
+  const visibleSchedules = useMemo(
+    () => schedules.filter(s => s.status !== 'cancelled'),
+    [schedules]
+  );
+
   const filteredSchedules = filterType === 'all'
-    ? scheduleList
-    : scheduleList.filter(s => s.courseType === filterType);
+    ? visibleSchedules
+    : visibleSchedules.filter(s => s.courseType === filterType);
 
   const handleGenerate = (rule: CycleRule) => {
     const dates = generateScheduleDates(rule.startDate, rule.weekdays, rule.weeksCount);
@@ -60,10 +70,43 @@ const SchedulePage: React.FC = () => {
       confirmText: '确认生成',
       success: (res) => {
         if (res.confirm) {
-          Taro.showToast({
-            title: `已生成 ${dates.length} 节排期`,
-            icon: 'success'
-          });
+          Taro.showLoading({ title: '生成中...' });
+          setTimeout(() => {
+            const newSchedules: Schedule[] = dates.map((dateStr, idx) => {
+              const seqNum = (scheduleIdSeq || 100) + idx + 1;
+              return {
+                id: `sch${String(seqNum).padStart(3, '0')}`,
+                title: rule.name.split('·')[0] || getCourseTypeName(rule.courseType) + '课',
+                date: dateStr,
+                startTime: rule.startTime,
+                endTime: rule.endTime,
+                courseType: rule.courseType,
+                studioId: rule.studioId,
+                studioName: rule.studioName,
+                teacherId: 't001',
+                teacherName: '李明远',
+                studentIds: [],
+                studentCount: 0,
+                maxCapacity: 10,
+                level: rule.courseType === 'oil' ? 'intermediate' : 'beginner',
+                maxStudents: 10,
+                enrolledCount: 0,
+                enrolledStudentIds: [],
+                status: 'open',
+                cycleRuleId: rule.id
+              } as Schedule;
+            });
+            const added = addSchedules(newSchedules);
+            if (newSchedules.length > 0) {
+              updateIdSeq({ scheduleIdSeq: (scheduleIdSeq || 100) + newSchedules.length });
+            }
+            Taro.hideLoading();
+            Taro.showToast({
+              title: `已生成 ${added} 节排课`,
+              icon: 'success'
+            });
+            setActiveTab('schedule');
+          }, 800);
         }
       }
     }).catch(err => console.error('[Schedule] modal error:', err));

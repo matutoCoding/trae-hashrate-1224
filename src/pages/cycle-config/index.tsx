@@ -6,9 +6,9 @@ import classnames from 'classnames';
 import { WEEKDAY_NAMES, generateScheduleDates } from '@/utils/date';
 import { studioList } from '@/data/studios';
 import { teacherList } from '@/data/teachers';
-import { scheduleList } from '@/data/schedules';
 import { getCourseTypeName } from '@/utils/score';
-import type { CourseType, Weekday } from '@/types';
+import { useAppStore } from '@/store';
+import type { CourseType, Schedule, Weekday } from '@/types';
 import dayjs from 'dayjs';
 
 const WEEKDAY_SHORT = ['一', '二', '三', '四', '五', '六', '日'];
@@ -32,6 +32,10 @@ const CycleConfigPage: React.FC = () => {
   const [selectedStudioId, setSelectedStudioId] = useState<string>('');
   const [selectedTeacherId, setSelectedTeacherId] = useState<string>('');
 
+  const schedules = useAppStore(s => s.schedules);
+  const scheduleIdSeq = useAppStore(s => s.scheduleIdSeq);
+  const addSchedules = useAppStore(s => s.addSchedules);
+  const updateIdSeq = useAppStore.setState;
   const startDate = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
   const generatedDates = useMemo(() =>
     generateScheduleDates(startDate, selectedWeekdays, weeksCount),
@@ -41,16 +45,17 @@ const CycleConfigPage: React.FC = () => {
   const conflictDates = useMemo(() => {
     const result: string[] = [];
     generatedDates.forEach(dateStr => {
-      const conflict = scheduleList.some(s =>
+      const conflict = schedules.some(s =>
         s.date === dateStr &&
         s.studioId === selectedStudioId &&
+        s.status !== 'cancelled' &&
         ((s.startTime <= startTime && s.endTime > startTime) ||
           (s.startTime < endTime && s.endTime >= endTime))
       );
       if (conflict) result.push(dateStr);
     });
     return result;
-  }, [generatedDates, selectedStudioId, startTime, endTime]);
+  }, [generatedDates, selectedStudioId, startTime, endTime, schedules]);
 
   const toggleWeekday = (day: Weekday) => {
     setSelectedWeekdays(prev =>
@@ -124,7 +129,13 @@ const CycleConfigPage: React.FC = () => {
       return;
     }
 
-    const content = `即将生成 ${generatedDates.length} 节${getCourseTypeName(courseType)}课程，${conflictDates.length} 个时间冲突。` +
+    const studio = studioList.find(s => s.id === selectedStudioId);
+    const teacher = teacherList.find(t => t.id === selectedTeacherId);
+    if (!studio || !teacher) return;
+
+    const expected = generatedDates.length - conflictDates.length;
+
+    const content = `即将生成 ${generatedDates.length} 节${getCourseTypeName(courseType)}课程，检测到 ${conflictDates.length} 个时间冲突。` +
       (conflictDates.length > 0 ? '\n冲突的日期将跳过生成。是否确认？' : '');
 
     Taro.showModal({
@@ -135,16 +146,48 @@ const CycleConfigPage: React.FC = () => {
         if (res.confirm) {
           Taro.showLoading({ title: '生成中...' });
           setTimeout(() => {
+            const newSchedules: Schedule[] = generatedDates
+              .filter(dateStr => !conflictDates.includes(dateStr))
+              .map((dateStr, idx) => {
+                void scheduleIdSeq;
+                const seqNum = (scheduleIdSeq || 100) + idx + 1;
+                return {
+                  id: `sch${String(seqNum).padStart(3, '0')}`,
+                  title: `${getCourseTypeName(courseType)}课`,
+                  date: dateStr,
+                  startTime,
+                  endTime,
+                  courseType,
+                  studioId: selectedStudioId,
+                  studioName: studio.name,
+                  teacherId: selectedTeacherId,
+                  teacherName: teacher.name,
+                  studentIds: [],
+                  studentCount: 0,
+                  maxCapacity: maxStudents,
+                  level: courseType === 'oil' ? 'intermediate' : 'beginner',
+                  maxStudents,
+                  enrolledCount: 0,
+                  enrolledStudentIds: [],
+                  status: 'open'
+                } as Schedule;
+              });
+
+            const added = addSchedules(newSchedules);
+            if (newSchedules.length > 0) {
+              updateIdSeq({ scheduleIdSeq: (scheduleIdSeq || 100) + newSchedules.length });
+            }
+
             Taro.hideLoading();
             Taro.showToast({
-              title: `成功生成 ${generatedDates.length - conflictDates.length} 节排课`,
+              title: `成功生成 ${added} 节排课${added < expected ? `（跳过${expected - added}节重复）` : ''}`,
               icon: 'success',
-              duration: 2000
+              duration: 2500
             });
             setTimeout(() => {
               Taro.switchTab({ url: '/pages/schedule/index' });
-            }, 1500);
-          }, 1200);
+            }, 1800);
+          }, 800);
         }
       }
     });

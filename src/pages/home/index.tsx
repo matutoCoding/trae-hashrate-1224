@@ -4,9 +4,7 @@ import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
 import ScheduleItem from '@/components/ScheduleItem';
 import QuickEntry from '@/components/QuickEntry';
-import { scheduleList } from '@/data/schedules';
-import { matchResultList, getMatchStats } from '@/data/matches';
-import { artworkList } from '@/data/artworks';
+import { useAppStore } from '@/store';
 import { formatDate } from '@/utils/date';
 import type { QuickEntry as QuickEntryType } from '@/types';
 
@@ -20,11 +18,16 @@ const quickEntries: QuickEntryType[] = [
 const HomePage: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
 
+  const schedules = useAppStore(s => s.schedules);
+  const matches = useAppStore(s => s.matches);
+  const artworks = useAppStore(s => s.artworks);
+  const getMatchStats = useAppStore(s => s.getMatchStats);
+
   const todayStr = formatDate(new Date());
-  const todaySchedules = scheduleList.filter(s => s.date === todayStr);
+  const todaySchedules = schedules.filter(s => s.date === todayStr && s.status !== 'cancelled');
   const matchStats = getMatchStats();
-  const mutualMatches = matchResultList.filter(m => m.mutual).slice(0, 2);
-  const previewArtworks = artworkList.slice(0, 3);
+  const mutualMatches = matches.filter(m => m.mutual).slice(0, 2);
+  const previewArtworks = artworks.slice(0, 3);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -64,15 +67,15 @@ const HomePage: React.FC = () => {
         </View>
         <View className={styles.heroStats}>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>{scheduleList.length}</Text>
-            <Text className={styles.statLabel}>本周课程</Text>
+            <Text className={styles.statValue}>{schedules.filter(s => s.status !== 'cancelled').length}</Text>
+            <Text className={styles.statLabel}>总课程</Text>
           </View>
           <View className={styles.statItem}>
             <Text className={styles.statValue}>{matchStats.mutual}</Text>
             <Text className={styles.statLabel}>互选成功</Text>
           </View>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>{artworkList.length}</Text>
+            <Text className={styles.statValue}>{artworks.length}</Text>
             <Text className={styles.statLabel}>作品归档</Text>
           </View>
         </View>

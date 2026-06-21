@@ -5,10 +5,10 @@ import styles from './index.module.scss';
 import classnames from 'classnames';
 import MatchCard from '@/components/MatchCard';
 import EmptyState from '@/components/EmptyState';
-import { getMatchStats, matchResultList } from '@/data/matches';
 import { teacherList } from '@/data/teachers';
 import { studentList } from '@/data/students';
 import { getCourseTypeName, getLevelName } from '@/utils/score';
+import { useAppStore } from '@/store';
 
 const tabs = [
   { key: 'matched', label: '互选成功' },
@@ -19,13 +19,19 @@ const tabs = [
 const MatchPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('matched');
   const [intentRole, setIntentRole] = useState<'student' | 'teacher'>('student');
-  const [selectedTeachers, setSelectedTeachers] = useState<string[]>(['t001', 't003']);
-  const [selectedStudents, setSelectedStudents] = useState<string[]>(['stu001', 'stu002']);
+  const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
+  const matches = useAppStore(s => s.matches);
+  const getMatchStats = useAppStore(s => s.getMatchStats);
+  const setStudentTargets = useAppStore(s => s.setStudentTargets);
+  const setTeacherTargets = useAppStore(s => s.setTeacherTargets);
+  const intents = useAppStore(s => s.intents);
+
   const matchStats = getMatchStats();
-  const mutualMatches = matchResultList.filter(m => m.mutual);
-  const pendingMatches = matchResultList.filter(m => !m.mutual);
+  const mutualMatches = matches.filter(m => m.mutual);
+  const pendingMatches = matches.filter(m => !m.mutual && m.status !== 'rejected');
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -52,12 +58,17 @@ const MatchPage: React.FC = () => {
     }
     Taro.showModal({
       title: '提交意愿',
-      content: `您已选择 ${count} 位${intentRole === 'student' ? '老师' : '学员'}作为意向对象，提交后对方将收到通知。是否确认？`,
+      content: `您已选择 ${count} 位${intentRole === 'student' ? '老师' : '学员'}作为意向对象，提交后将重建匹配列表。是否确认？`,
       confirmText: '确认提交',
       success: (res) => {
         if (res.confirm) {
+          if (intentRole === 'student') {
+            setStudentTargets('stu001', selectedTeachers);
+          } else {
+            setTeacherTargets('t001', selectedStudents);
+          }
           Taro.showToast({ title: '意愿提交成功', icon: 'success' });
-          setActiveTab('pending');
+          setTimeout(() => setActiveTab('matched'), 600);
         }
       }
     }).catch(err => console.error('[Match] modal error:', err));

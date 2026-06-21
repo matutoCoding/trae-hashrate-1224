@@ -2,25 +2,41 @@ import React, { useMemo } from 'react';
 import { View, Text, Image } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import styles from './index.module.scss';
-import { scheduleList } from '@/data/schedules';
 import { studioList } from '@/data/studios';
 import { teacherList } from '@/data/teachers';
 import { studentList } from '@/data/students';
 import { getCourseTypeName, getLevelName, getStatusLabel } from '@/utils/score';
 import { WEEKDAY_NAMES, formatDuration } from '@/utils/date';
+import { useAppStore } from '@/store';
 import dayjs from 'dayjs';
 import classnames from 'classnames';
+
+const timeOptions = ['09:00', '10:00', '14:00', '15:00', '16:00', '18:30', '19:30'];
 
 const ScheduleDetailPage: React.FC = () => {
   const router = useRouter();
   const id = router.params.id || 'sch001';
-  const schedule = useMemo(() => scheduleList.find(s => s.id === id) || scheduleList[0], [id]);
-  const studio = useMemo(() => studioList.find(s => s.id === schedule.studioId), [schedule]);
-  const teacher = useMemo(() => teacherList.find(t => t.id === schedule.teacherId), [schedule]);
+  const getScheduleById = useAppStore(s => s.getScheduleById);
+  const updateSchedule = useAppStore(s => s.updateSchedule);
+  const cancelSchedule = useAppStore(s => s.cancelSchedule);
+  const schedules = useAppStore(s => s.schedules);
+
+  const schedule = useMemo(() => getScheduleById(id) || schedules[0], [id, getScheduleById, schedules]);
+  const studio = useMemo(() => studioList.find(s => s.id === schedule?.studioId), [schedule]);
+  const teacher = useMemo(() => teacherList.find(t => t.id === schedule?.teacherId), [schedule]);
   const enrolledStudents = useMemo(() =>
-    studentList.filter(stu => schedule.enrolledStudentIds.includes(stu.id)),
+    schedule ? studentList.filter(stu => schedule.enrolledStudentIds.includes(stu.id)) : [],
     [schedule]
   );
+
+  if (!schedule) {
+    return (
+      <View style={{ padding: 100, textAlign: 'center' }}>
+        <Text style={{ fontSize: 28, color: '#999' }}>课程不存在</Text>
+      </View>
+    );
+  }
+
   const progress = Math.round((schedule.enrolledCount / schedule.maxStudents) * 100);
   const dateObj = dayjs(schedule.date);
 
@@ -28,20 +44,48 @@ const ScheduleDetailPage: React.FC = () => {
     Taro.showActionSheet({
       itemList: ['调整时间', '更换画室', '更换老师', '取消课程'],
       success: (res) => {
-        const labels = ['调整时间', '更换画室', '更换老师', '取消课程'];
-        if (res.tapIndex === 3) {
+        if (res.tapIndex === 0) {
+          Taro.showActionSheet({
+            itemList: timeOptions,
+            success: (tr) => {
+              const newStart = timeOptions[tr.tapIndex];
+              const endHour = Number(newStart.split(':')[0]) + 3;
+              const newEnd = `${String(endHour).padStart(2, '0')}:00`;
+              updateSchedule(id, { startTime: newStart, endTime: newEnd });
+              Taro.showToast({ title: `时间已调整为 ${newStart}-${newEnd}`, icon: 'success' });
+            }
+          }).catch(() => {});
+        } else if (res.tapIndex === 1) {
+          Taro.showActionSheet({
+            itemList: studioList.map(s => s.name),
+            success: (sr) => {
+              const newStudio = studioList[sr.tapIndex];
+              updateSchedule(id, { studioId: newStudio.id, studioName: newStudio.name });
+              Taro.showToast({ title: `画室已更换为${newStudio.name}`, icon: 'success' });
+            }
+          }).catch(() => {});
+        } else if (res.tapIndex === 2) {
+          Taro.showActionSheet({
+            itemList: teacherList.map(t => t.name),
+            success: (tr2) => {
+              const newTeacher = teacherList[tr2.tapIndex];
+              updateSchedule(id, { teacherId: newTeacher.id, teacherName: newTeacher.name });
+              Taro.showToast({ title: `老师已更换为${newTeacher.name}`, icon: 'success' });
+            }
+          }).catch(() => {});
+        } else if (res.tapIndex === 3) {
           Taro.showModal({
             title: '确认取消？',
             content: '取消课程会通知已报名的学员，是否继续？',
             confirmColor: '#E8453C',
             success: (m) => {
               if (m.confirm) {
+                cancelSchedule(id);
                 Taro.showToast({ title: '课程已取消', icon: 'success' });
+                setTimeout(() => Taro.navigateBack().catch(() => {}), 1000);
               }
             }
           });
-        } else {
-          Taro.showToast({ title: `${labels[res.tapIndex]}功能开发中`, icon: 'none' });
         }
       }
     }).catch(err => console.error('[ScheduleDetail] adjust error:', err));

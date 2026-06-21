@@ -3,7 +3,6 @@ import { View, Text, Image } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import styles from './index.module.scss';
 import classnames from 'classnames';
-import { buildAllMatches } from '@/data/matches';
 import { teacherList } from '@/data/teachers';
 import { studentList } from '@/data/students';
 import {
@@ -13,6 +12,7 @@ import {
   getScoreColor,
   getScoreLabel
 } from '@/utils/score';
+import { useAppStore } from '@/store';
 import type { MatchResult } from '@/types';
 
 const dimConfig = [
@@ -25,16 +25,21 @@ const dimConfig = [
 
 const MatchDetailPage: React.FC = () => {
   const router = useRouter();
-  const teacherId = router.params.teacherId || 't001';
-  const studentId = router.params.studentId || 'stu001';
+  const matchId = router.params.id;
 
-  const teacher = useMemo(() => teacherList.find(t => t.id === teacherId), [teacherId]);
-  const student = useMemo(() => studentList.find(s => s.id === studentId), [studentId]);
-  const allMatches = useMemo(() => buildAllMatches(), []);
-  const match = useMemo<MatchResult | undefined>(() =>
-    allMatches.find(m => m.teacherId === teacherId && m.studentId === studentId),
-    [allMatches, teacherId, studentId]
-  );
+  const matches = useAppStore(s => s.matches);
+  const confirmMatch = useAppStore(s => s.confirmMatch);
+  const rejectMatch = useAppStore(s => s.rejectMatch);
+
+  const match = useMemo<MatchResult | undefined>(() => {
+    if (matchId) {
+      return matches.find(m => m.id === matchId);
+    }
+    return matches[0];
+  }, [matchId, matches]);
+
+  const teacher = useMemo(() => teacherList.find(t => t.id === match?.teacherId), [match]);
+  const student = useMemo(() => studentList.find(s => s.id === match?.studentId), [match]);
 
   const scores = useMemo(() => {
     if (!teacher || !student) return null;
@@ -49,14 +54,17 @@ const MatchDetailPage: React.FC = () => {
   };
 
   const handleConfirm = () => {
-    if (match?.mutual) {
+    if (!match) return;
+    if (match.mutual) {
       Taro.showModal({
         title: '确认成交？',
         content: `与${teacher?.name}老师确认互选关系后，将开始安排试听课。`,
         confirmColor: '#4CAF50',
         success: (res) => {
           if (res.confirm) {
+            confirmMatch(match.id);
             Taro.showToast({ title: '已确认，静待佳音！', icon: 'success' });
+            setTimeout(() => Taro.navigateBack().catch(() => {}), 900);
           }
         }
       });
@@ -75,13 +83,16 @@ const MatchDetailPage: React.FC = () => {
   };
 
   const handleReject = () => {
+    if (!match) return;
     Taro.showModal({
       title: '放弃匹配？',
       content: `取消本次匹配意向，后续可重新选择。`,
       confirmColor: '#E8453C',
       success: (res) => {
         if (res.confirm) {
+          rejectMatch(match.id);
           Taro.showToast({ title: '已取消匹配', icon: 'none' });
+          setTimeout(() => Taro.navigateBack().catch(() => {}), 900);
         }
       }
     });

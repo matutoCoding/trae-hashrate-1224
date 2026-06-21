@@ -3,43 +3,21 @@ import { View, Text, Image } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import styles from './index.module.scss';
 import classnames from 'classnames';
-import { artworkList } from '@/data/artworks';
 import { studentList } from '@/data/students';
 import { teacherList } from '@/data/teachers';
 import { getCourseTypeName, getLevelName } from '@/utils/score';
+import { useAppStore } from '@/store';
 import dayjs from 'dayjs';
-
-interface CommentMock {
-  id: string;
-  userName: string;
-  avatar: string;
-  time: string;
-  content: string;
-}
-
-const mockComments: CommentMock[] = [
-  {
-    id: 'c1',
-    userName: '陈丹青',
-    avatar: 'https://picsum.photos/id/1003/200/200',
-    time: '2小时前',
-    content: '色彩运用很大胆，笔触有张力！建议在远景部分可以稍微弱化一些对比，让空间层次更加深远。'
-  },
-  {
-    id: 'c2',
-    userName: '李明远',
-    avatar: 'https://picsum.photos/id/1005/200/200',
-    time: '昨天',
-    content: '这张作品的光影处理非常出色，水面的倒影尤其传神，继续保持！'
-  }
-];
 
 const ArtworkDetailPage: React.FC = () => {
   const router = useRouter();
   const id = router.params.id || 'art001';
-  const artwork = useMemo(() => artworkList.find(a => a.id === id) || artworkList[0], [id]);
-  const student = useMemo(() => studentList.find(s => s.id === artwork.studentId), [artwork]);
-  const teacher = useMemo(() => teacherList.find(t => t.id === artwork.teacherId), [artwork]);
+  const artworks = useAppStore(s => s.artworks);
+  const likeArtwork = useAppStore(s => s.likeArtwork);
+
+  const artwork = useMemo(() => artworks.find(a => a.id === id) || artworks[0], [id, artworks]);
+  const student = useMemo(() => studentList.find(s => s.id === artwork?.studentId), [artwork]);
+  const teacher = useMemo(() => teacherList.find(t => t.id === artwork?.teacherId), [artwork]);
 
   const [liked, setLiked] = useState(false);
   const [collected, setCollected] = useState(false);
@@ -69,7 +47,11 @@ const ArtworkDetailPage: React.FC = () => {
   };
 
   const toggleLike = () => {
-    setLiked(!liked);
+    const newLiked = !liked;
+    setLiked(newLiked);
+    if (artwork && newLiked) {
+      likeArtwork(artwork.id);
+    }
     Taro.showToast({ title: liked ? '已取消点赞' : '❤️ 点赞成功', icon: 'none' });
   };
 
@@ -81,6 +63,14 @@ const ArtworkDetailPage: React.FC = () => {
   const openComment = () => {
     Taro.showToast({ title: '评论功能开发中', icon: 'none' });
   };
+
+  if (!artwork) {
+    return (
+      <View style={{ padding: 100, textAlign: 'center' }}>
+        <Text style={{ fontSize: 28, color: '#999' }}>作品不存在</Text>
+      </View>
+    );
+  }
 
   return (
     <View className={styles.page}>
@@ -160,24 +150,30 @@ const ArtworkDetailPage: React.FC = () => {
         <View className={styles.commentsSection}>
           <Text className={styles.sectionTitle}>
             <Text className={styles.titleIcon}>💬</Text>
-            老师点评 ({mockComments.length})
+            评论与点评 ({artwork.comments.length})
           </Text>
-          {mockComments.map(c => (
-            <View key={c.id} className={styles.commentItem}>
-              <Image
-                className={styles.commentAvatar}
-                src={c.avatar}
-                mode='aspectFill'
-              />
-              <View className={styles.commentContent}>
-                <View className={styles.commentHeader}>
-                  <Text className={styles.commentName}>{c.userName}</Text>
-                  <Text className={styles.commentTime}>{c.time}</Text>
+          {artwork.comments.length > 0 ? (
+            artwork.comments.map(c => (
+              <View key={c.id} className={styles.commentItem}>
+                <Image
+                  className={styles.commentAvatar}
+                  src={c.userAvatar}
+                  mode='aspectFill'
+                />
+                <View className={styles.commentContent}>
+                  <View className={styles.commentHeader}>
+                    <Text className={styles.commentName}>{c.userName}</Text>
+                    <Text className={styles.commentTime}>{c.createdAt}</Text>
+                  </View>
+                  <Text className={styles.commentText}>{c.content}</Text>
                 </View>
-                <Text className={styles.commentText}>{c.content}</Text>
               </View>
+            ))
+          ) : (
+            <View style={{ padding: 32, textAlign: 'center' }}>
+              <Text style={{ fontSize: 24, color: '#999' }}>暂无评论，快来做第一个点评的人吧～</Text>
             </View>
-          ))}
+          )}
         </View>
       </View>
 
