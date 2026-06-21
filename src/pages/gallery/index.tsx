@@ -6,8 +6,6 @@ import classnames from 'classnames';
 import ArtworkItem from '@/components/ArtworkItem';
 import EmptyState from '@/components/EmptyState';
 import { useAppStore } from '@/store';
-import type { CourseType } from '@/types';
-import dayjs from 'dayjs';
 
 const typeFilters: { key: string; label: string }[] = [
   { key: 'all', label: '全部作品' },
@@ -19,19 +17,6 @@ const typeFilters: { key: string; label: string }[] = [
   { key: 'digital', label: '数字绘画' }
 ];
 
-const courseTypeOptions = ['sketch', 'watercolor', 'oil', 'chinese', 'creative', 'digital'] as CourseType[];
-const courseTypeLabels = ['素描', '水彩', '油画', '国画', '创意', '数字绘画'];
-const sampleImages = [
-  'https://picsum.photos/id/1025/600/800',
-  'https://picsum.photos/id/1040/800/600',
-  'https://picsum.photos/id/1028/500/700',
-  'https://picsum.photos/id/106/600/750',
-  'https://picsum.photos/id/1074/700/600',
-  'https://picsum.photos/id/1027/500/650'
-];
-const studentNames = ['沈语桐', '苏念慈', '陈逸飞', '林梦琪', '赵浩然', '周雅诗'];
-const teacherNames = ['李明远', '王思雨', '陈丹青', '张艺涵', '林小晴'];
-
 const GalleryPage: React.FC = () => {
   const [filterType, setFilterType] = useState('all');
   const [sortBy, setSortBy] = useState<'latest' | 'likes'>('latest');
@@ -40,7 +25,6 @@ const GalleryPage: React.FC = () => {
 
   const artworks = useAppStore(s => s.artworks);
   const getArtworkStats = useAppStore(s => s.getArtworkStats);
-  const addArtwork = useAppStore(s => s.addArtwork);
 
   const stats = getArtworkStats();
 
@@ -63,43 +47,7 @@ const GalleryPage: React.FC = () => {
   }, [artworks, filterType, sortBy]);
 
   const handleUpload = () => {
-    Taro.showActionSheet({
-      itemList: ['拍照上传', '从相册选择', '快速添加示例作品'],
-      success: (res) => {
-        if (res.tapIndex === 2) {
-          const titleList = ['夏日花园', '城市印象', '童趣涂鸦', '静谧湖畔', '古风少女', '梦幻星空'];
-          const idx = Math.floor(Math.random() * sampleImages.length);
-          const typeIdx = Math.floor(Math.random() * courseTypeOptions.length);
-          const sIdx = Math.floor(Math.random() * studentNames.length);
-          const tIdx = Math.floor(Math.random() * teacherNames.length);
-          const newArtwork = addArtwork({
-            title: titleList[idx] + ' · 新作',
-            image: sampleImages[idx],
-            studentId: `stu${String(sIdx + 1).padStart(3, '0')}`,
-            studentName: studentNames[sIdx],
-            studentAvatar: `https://picsum.photos/id/${1000 + sIdx}/200/200`,
-            courseType: courseTypeOptions[typeIdx],
-            teacherId: `t${String(tIdx + 1).padStart(3, '0')}`,
-            teacherName: teacherNames[tIdx],
-            description: `这是我今天的练习作品，尝试了${courseTypeLabels[typeIdx]}的新技法。老师给了很多宝贵建议，再接再厉！`,
-            tags: [courseTypeLabels[typeIdx], '练习', '新作'],
-            createdAt: dayjs().format('YYYY-MM-DD')
-          });
-          Taro.showToast({ title: '上传成功！', icon: 'success' });
-          setTimeout(() => {
-            Taro.navigateTo({
-              url: `/pages/artwork-detail/index?id=${newArtwork.id}`
-            }).catch(() => {});
-          }, 800);
-        } else {
-          Taro.showToast({
-            title: '上传成功，已添加示例作品',
-            icon: 'none'
-          });
-          setTimeout(() => handleUpload(), 300);
-        }
-      }
-    }).catch(err => console.error('[Gallery] actionSheet error:', err));
+    Taro.navigateTo({ url: '/pages/artwork-upload/index' }).catch(() => {});
   };
 
   return (

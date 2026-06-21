@@ -13,6 +13,34 @@ interface IntentState {
   teacherTargetStudents: Record<string, string[]>;
 }
 
+interface PersistData {
+  schedules: Schedule[];
+  artworks: Artwork[];
+  intents: IntentState;
+  scheduleIdSeq: number;
+  artworkIdSeq: number;
+}
+
+const STORAGE_KEY = 'artclass_store';
+
+const loadPersisted = (): Partial<PersistData> | null => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    }
+  } catch { /* ignore */ }
+  return null;
+};
+
+const savePersisted = (data: PersistData) => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+  } catch { /* ignore */ }
+};
+
 interface AppState {
   schedules: Schedule[];
   artworks: Artwork[];
@@ -53,7 +81,6 @@ const buildMatchesFromIntents = (
   matchIdSeqRef: { value: number }
 ): MatchResult[] => {
   const results: MatchResult[] = [];
-
   for (const student of students) {
     for (const teacher of teachers) {
       const studentTargets = intents.studentTargetTeachers[student.id] || student.targetTeachers;
@@ -95,37 +122,50 @@ const buildMatchesFromIntents = (
   return results;
 };
 
-const initialStudentsCopy = initialStudents.map(s => ({ ...s }));
-const initialTeachersCopy = initialTeachers.map(t => ({ ...t }));
-const initialSchedulesCopy = initialSchedules.map(s => ({ ...s }));
-const initialArtworksCopy = initialArtworks.map(a => ({ ...a, comments: [...a.comments] }));
+const defaultStudents = initialStudents.map(s => ({ ...s }));
+const defaultTeachers = initialTeachers.map(t => ({ ...t }));
+const defaultSchedules = initialSchedules.map(s => ({ ...s }));
+const defaultArtworks = initialArtworks.map(a => ({ ...a, comments: [...a.comments] }));
+const defaultIntents: IntentState = { studentTargetTeachers: {}, teacherTargetStudents: {} };
 
-const initialIntents: IntentState = {
-  studentTargetTeachers: {},
-  teacherTargetStudents: {}
-};
+const persisted = loadPersisted();
+const initSchedules = persisted?.schedules || defaultSchedules;
+const initArtworks = persisted?.artworks || defaultArtworks;
+const initIntents = persisted?.intents || defaultIntents;
+const initScheduleIdSeq = persisted?.scheduleIdSeq || 100;
+const initArtworkIdSeq = persisted?.artworkIdSeq || 100;
 
 const seqRef = { value: 0 };
-const initialMatches = buildMatchesFromIntents(initialStudentsCopy.slice(0, 8), initialTeachersCopy, initialIntents, seqRef);
+const initMatches = buildMatchesFromIntents(defaultStudents.slice(0, 8), defaultTeachers, initIntents, seqRef);
+
+const persistState = (state: Pick<AppState, 'schedules' | 'artworks' | 'intents' | 'scheduleIdSeq' | 'artworkIdSeq'>) => {
+  savePersisted({
+    schedules: state.schedules,
+    artworks: state.artworks,
+    intents: state.intents,
+    scheduleIdSeq: state.scheduleIdSeq,
+    artworkIdSeq: state.artworkIdSeq
+  });
+};
 
 export const useAppStore = create<AppState>((set, get) => ({
-  schedules: initialSchedulesCopy,
-  artworks: initialArtworksCopy,
-  students: initialStudentsCopy,
-  teachers: initialTeachersCopy,
-  matches: initialMatches,
-  intents: initialIntents,
+  schedules: initSchedules,
+  artworks: initArtworks,
+  students: defaultStudents,
+  teachers: defaultTeachers,
+  matches: initMatches,
+  intents: initIntents,
 
-  scheduleIdSeq: 100,
-  artworkIdSeq: 100,
+  scheduleIdSeq: initScheduleIdSeq,
+  artworkIdSeq: initArtworkIdSeq,
   matchIdSeq: seqRef.value,
 
   addSchedules: (newSchedules) => {
-    const { schedules } = get();
-    const { studioList: studios } = { studioList };
     let added = 0;
-    const existingSet = new Set(schedules.map(s => `${s.date}-${s.startTime}-${s.endTime}-${s.studioId}`));
-    const merged: Schedule[] = [...schedules];
+    const existingSet = new Set(
+      get().schedules.map(s => `${s.date}-${s.startTime}-${s.endTime}-${s.studioId}`)
+    );
+    const merged: Schedule[] = [...get().schedules];
     for (const sch of newSchedules) {
       const key = `${sch.date}-${sch.startTime}-${sch.endTime}-${sch.studioId}`;
       if (!existingSet.has(key)) {
@@ -134,21 +174,22 @@ export const useAppStore = create<AppState>((set, get) => ({
         existingSet.add(key);
       }
     }
-    set({ schedules: merged });
-    void studios;
+    const nextSeq = get().scheduleIdSeq + newSchedules.length;
+    set({ schedules: merged, scheduleIdSeq: nextSeq });
+    persistState({ ...get(), schedules: merged, scheduleIdSeq: nextSeq });
     return added;
   },
 
   updateSchedule: (id, patch) => {
-    set(state => ({
-      schedules: state.schedules.map(s => s.id === id ? { ...s, ...patch } : s)
-    }));
+    const newSchedules = get().schedules.map(s => s.id === id ? { ...s, ...patch } : s);
+    set({ schedules: newSchedules });
+    persistState({ ...get(), schedules: newSchedules });
   },
 
   cancelSchedule: (id) => {
-    set(state => ({
-      schedules: state.schedules.map(s => s.id === id ? { ...s, status: 'cancelled' as const } : s)
-    }));
+    const newSchedules = get().schedules.map(s => s.id === id ? { ...s, status: 'cancelled' as const } : s);
+    set({ schedules: newSchedules });
+    persistState({ ...get(), schedules: newSchedules });
   },
 
   getScheduleById: (id) => get().schedules.find(s => s.id === id),
@@ -164,64 +205,54 @@ export const useAppStore = create<AppState>((set, get) => ({
       createdAt: artwork.createdAt || dayjs().format('YYYY-MM-DD'),
       ...artwork
     };
-    set(state => ({
-      artworks: [fullArtwork, ...state.artworks],
-      artworkIdSeq: artworkIdSeq + 1
-    }));
+    const newArtworks = [fullArtwork, ...get().artworks];
+    const nextSeq = artworkIdSeq + 1;
+    set({ artworks: newArtworks, artworkIdSeq: nextSeq });
+    persistState({ ...get(), artworks: newArtworks, artworkIdSeq: nextSeq });
     return fullArtwork;
   },
 
   addArtworkComment: (artworkId, comment) => {
-    set(state => ({
-      artworks: state.artworks.map(a => {
-        if (a.id !== artworkId) return a;
-        const newComment: ArtworkComment = {
-          id: `${artworkId}-c${a.comments.length + 1}`,
-          createdAt: dayjs().format('YYYY-MM-DD HH:mm'),
-          likes: 0,
-          ...comment
-        };
-        return { ...a, comments: [...a.comments, newComment] };
-      })
-    }));
+    const newArtworks = get().artworks.map(a => {
+      if (a.id !== artworkId) return a;
+      const newComment: ArtworkComment = {
+        id: `${artworkId}-c${a.comments.length + 1}`,
+        createdAt: dayjs().format('YYYY-MM-DD HH:mm'),
+        likes: 0,
+        ...comment
+      };
+      return { ...a, comments: [...a.comments, newComment] };
+    });
+    set({ artworks: newArtworks });
+    persistState({ ...get(), artworks: newArtworks });
   },
 
   likeArtwork: (artworkId) => {
-    set(state => ({
-      artworks: state.artworks.map(a => a.id === artworkId ? { ...a, likes: a.likes + 1 } : a)
-    }));
+    const newArtworks = get().artworks.map(a => a.id === artworkId ? { ...a, likes: a.likes + 1 } : a);
+    set({ artworks: newArtworks });
+    persistState({ ...get(), artworks: newArtworks });
   },
 
   setStudentTargets: (studentId, teacherIds) => {
-    set(state => {
-      const newIntents = {
-        ...state.intents,
-        studentTargetTeachers: { ...state.intents.studentTargetTeachers, [studentId]: teacherIds }
-      };
-      const seqRef2 = { value: 0 };
-      const newMatches = buildMatchesFromIntents(state.students, state.teachers, newIntents, seqRef2);
-      return {
-        intents: newIntents,
-        matches: newMatches,
-        matchIdSeq: seqRef2.value
-      };
-    });
+    const newIntents: IntentState = {
+      ...get().intents,
+      studentTargetTeachers: { ...get().intents.studentTargetTeachers, [studentId]: teacherIds }
+    };
+    const seqRef2 = { value: 0 };
+    const newMatches = buildMatchesFromIntents(get().students, get().teachers, newIntents, seqRef2);
+    set({ intents: newIntents, matches: newMatches, matchIdSeq: seqRef2.value });
+    persistState({ ...get(), intents: newIntents });
   },
 
   setTeacherTargets: (teacherId, studentIds) => {
-    set(state => {
-      const newIntents = {
-        ...state.intents,
-        teacherTargetStudents: { ...state.intents.teacherTargetStudents, [teacherId]: studentIds }
-      };
-      const seqRef2 = { value: 0 };
-      const newMatches = buildMatchesFromIntents(state.students, state.teachers, newIntents, seqRef2);
-      return {
-        intents: newIntents,
-        matches: newMatches,
-        matchIdSeq: seqRef2.value
-      };
-    });
+    const newIntents: IntentState = {
+      ...get().intents,
+      teacherTargetStudents: { ...get().intents.teacherTargetStudents, [teacherId]: studentIds }
+    };
+    const seqRef2 = { value: 0 };
+    const newMatches = buildMatchesFromIntents(get().students, get().teachers, newIntents, seqRef2);
+    set({ intents: newIntents, matches: newMatches, matchIdSeq: seqRef2.value });
+    persistState({ ...get(), intents: newIntents });
   },
 
   rebuildMatches: () => {

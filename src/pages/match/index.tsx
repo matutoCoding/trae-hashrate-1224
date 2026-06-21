@@ -19,6 +19,7 @@ const tabs = [
 const MatchPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('matched');
   const [intentRole, setIntentRole] = useState<'student' | 'teacher'>('student');
+  const [selectedPersonId, setSelectedPersonId] = useState('');
   const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -27,7 +28,8 @@ const MatchPage: React.FC = () => {
   const getMatchStats = useAppStore(s => s.getMatchStats);
   const setStudentTargets = useAppStore(s => s.setStudentTargets);
   const setTeacherTargets = useAppStore(s => s.setTeacherTargets);
-  const intents = useAppStore(s => s.intents);
+  const students = useAppStore(s => s.students);
+  const teachers = useAppStore(s => s.teachers);
 
   const matchStats = getMatchStats();
   const mutualMatches = matches.filter(m => m.mutual);
@@ -51,21 +53,30 @@ const MatchPage: React.FC = () => {
   };
 
   const submitIntent = () => {
+    if (!selectedPersonId) {
+      Taro.showToast({ title: '请先选择登记人', icon: 'none' });
+      return;
+    }
     const count = intentRole === 'student' ? selectedTeachers.length : selectedStudents.length;
     if (count === 0) {
       Taro.showToast({ title: '请先选择意向对象', icon: 'none' });
       return;
     }
+
+    const personName = intentRole === 'student'
+      ? students.find(s => s.id === selectedPersonId)?.name
+      : teachers.find(t => t.id === selectedPersonId)?.name;
+
     Taro.showModal({
       title: '提交意愿',
-      content: `您已选择 ${count} 位${intentRole === 'student' ? '老师' : '学员'}作为意向对象，提交后将重建匹配列表。是否确认？`,
+      content: `${personName}已选择 ${count} 位${intentRole === 'student' ? '老师' : '学员'}作为意向对象，提交后将重建匹配列表。是否确认？`,
       confirmText: '确认提交',
       success: (res) => {
         if (res.confirm) {
           if (intentRole === 'student') {
-            setStudentTargets('stu001', selectedTeachers);
+            setStudentTargets(selectedPersonId, selectedTeachers);
           } else {
-            setTeacherTargets('t001', selectedStudents);
+            setTeacherTargets(selectedPersonId, selectedStudents);
           }
           Taro.showToast({ title: '意愿提交成功', icon: 'success' });
           setTimeout(() => setActiveTab('matched'), 600);
@@ -208,21 +219,55 @@ const MatchPage: React.FC = () => {
                 <View className={styles.intentSwitch}>
                   <Text
                     className={classnames(styles.switchOption, intentRole === 'student' && styles.switchOptionActive)}
-                    onClick={() => setIntentRole('student')}
+                    onClick={() => { setIntentRole('student'); setSelectedPersonId(''); setSelectedTeachers([]); setSelectedStudents([]); }}
                   >
                     我是学员
                   </Text>
                   <Text
                     className={classnames(styles.switchOption, intentRole === 'teacher' && styles.switchOptionActive)}
-                    onClick={() => setIntentRole('teacher')}
+                    onClick={() => { setIntentRole('teacher'); setSelectedPersonId(''); setSelectedTeachers([]); setSelectedStudents([]); }}
                   >
                     我是老师
                   </Text>
                 </View>
               </View>
 
-              <View className={styles.personList}>
-                {intentRole === 'student' ? (
+              <View style={{ marginBottom: 24 }}>
+                <Text style={{ fontSize: 26, color: '#5A607F', fontWeight: 600, display: 'block', marginBottom: 12 }}>
+                  <Text style={{ color: '#FF3B30' }}>*</Text>
+                  {intentRole === 'student' ? '选择登记的学员' : '选择登记的老师'}
+                </Text>
+                <View style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                  {(intentRole === 'student' ? studentList.slice(0, 8) : teacherList).map(person => {
+                    const isSelected = selectedPersonId === person.id;
+                    return (
+                      <View
+                        key={person.id}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '8rpx 20rpx', borderRadius: 48,
+                          background: isSelected ? 'rgba(79,108,245,0.1)' : '#F7F8FC',
+                          border: isSelected ? '2rpx solid #4F6CF5' : '2rpx solid transparent'
+                        }}
+                        onClick={() => setSelectedPersonId(person.id)}
+                      >
+                        <Image src={person.avatar} mode='aspectFill' style={{ width: 40, height: 40, borderRadius: 20 }} />
+                        <Text style={{ fontSize: 24, color: isSelected ? '#4F6CF5' : '#5A607F', fontWeight: isSelected ? 600 : 400 }}>
+                          {person.name}
+                        </Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+
+              {!selectedPersonId ? (
+                <View style={{ padding: 32, textAlign: 'center' }}>
+                  <Text style={{ fontSize: 26, color: '#9094AB' }}>👆 请先选择登记人，再选择意向对象</Text>
+                </View>
+              ) : (
+                <View className={styles.personList}>
+                  {intentRole === 'student' ? (
                   teacherList.map(teacher => {
                     const isSelected = selectedTeachers.includes(teacher.id);
                     return (
@@ -295,6 +340,7 @@ const MatchPage: React.FC = () => {
                   })
                 )}
               </View>
+              )}
             </View>
           </>
         )}

@@ -156,3 +156,13 @@
   font-size: $font-size-xs;
   color: $color-text-tertiary;
 }
+
+.cardCancelled {
+  opacity: 0.6;
+  background: #FAFAFA;
+}
+
+.titleCancelled {
+  text-decoration: line-through;
+  color: $color-text-tertiary;
+}

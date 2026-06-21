@@ -35,7 +35,6 @@ const CycleConfigPage: React.FC = () => {
   const schedules = useAppStore(s => s.schedules);
   const scheduleIdSeq = useAppStore(s => s.scheduleIdSeq);
   const addSchedules = useAppStore(s => s.addSchedules);
-  const updateIdSeq = useAppStore.setState;
   const startDate = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
   const generatedDates = useMemo(() =>
     generateScheduleDates(startDate, selectedWeekdays, weeksCount),
@@ -133,10 +132,18 @@ const CycleConfigPage: React.FC = () => {
     const teacher = teacherList.find(t => t.id === selectedTeacherId);
     if (!studio || !teacher) return;
 
-    const expected = generatedDates.length - conflictDates.length;
+    const planned = generatedDates.length;
+    const skipped = conflictDates.length;
+    const expected = planned - skipped;
 
-    const content = `即将生成 ${generatedDates.length} 节${getCourseTypeName(courseType)}课程，检测到 ${conflictDates.length} 个时间冲突。` +
-      (conflictDates.length > 0 ? '\n冲突的日期将跳过生成。是否确认？' : '');
+    let content = `📋 计划生成：${planned} 节`;
+    if (skipped > 0) {
+      content += `\n⛔ 跳过冲突：${skipped} 节（画室${studio.name}时间冲突）`;
+    }
+    content += `\n✅ 实际新增：${expected} 节`;
+    if (skipped === 0) {
+      content += '\n\n未检测到时间冲突，全部可生成。';
+    }
 
     Taro.showModal({
       title: '确认批量生成？',
@@ -149,8 +156,7 @@ const CycleConfigPage: React.FC = () => {
             const newSchedules: Schedule[] = generatedDates
               .filter(dateStr => !conflictDates.includes(dateStr))
               .map((dateStr, idx) => {
-                void scheduleIdSeq;
-                const seqNum = (scheduleIdSeq || 100) + idx + 1;
+                const seqNum = scheduleIdSeq + idx + 1;
                 return {
                   id: `sch${String(seqNum).padStart(3, '0')}`,
                   title: `${getCourseTypeName(courseType)}课`,
@@ -174,19 +180,16 @@ const CycleConfigPage: React.FC = () => {
               });
 
             const added = addSchedules(newSchedules);
-            if (newSchedules.length > 0) {
-              updateIdSeq({ scheduleIdSeq: (scheduleIdSeq || 100) + newSchedules.length });
-            }
 
             Taro.hideLoading();
             Taro.showToast({
-              title: `成功生成 ${added} 节排课${added < expected ? `（跳过${expected - added}节重复）` : ''}`,
+              title: `✅ 实际新增 ${added} 节${added < expected ? `（${expected - added}节已存在）` : ''}`,
               icon: 'success',
-              duration: 2500
+              duration: 3000
             });
             setTimeout(() => {
               Taro.switchTab({ url: '/pages/schedule/index' });
-            }, 1800);
+            }, 2000);
           }, 800);
         }
       }

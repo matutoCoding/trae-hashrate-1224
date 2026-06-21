@@ -41,22 +41,22 @@ const courseFilters: { key: string; label: string }[] = [
 const SchedulePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('rules');
   const [filterType, setFilterType] = useState('all');
+  const [showCancelled, setShowCancelled] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const schedules = useAppStore(s => s.schedules);
   const addSchedules = useAppStore(s => s.addSchedules);
   const scheduleIdSeq = useAppStore(s => s.scheduleIdSeq);
-  const updateIdSeq = useAppStore.setState;
 
   const onRefresh = () => {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 800);
   };
 
-  const visibleSchedules = useMemo(
-    () => schedules.filter(s => s.status !== 'cancelled'),
-    [schedules]
-  );
+  const visibleSchedules = useMemo(() => {
+    if (showCancelled) return schedules;
+    return schedules.filter(s => s.status !== 'cancelled');
+  }, [schedules, showCancelled]);
 
   const filteredSchedules = filterType === 'all'
     ? visibleSchedules
@@ -64,16 +64,43 @@ const SchedulePage: React.FC = () => {
 
   const handleGenerate = (rule: CycleRule) => {
     const dates = generateScheduleDates(rule.startDate, rule.weekdays, rule.weeksCount);
+    const existingSet = new Set(schedules.map(s => `${s.date}-${s.startTime}-${s.endTime}-${s.studioId}`));
+    const skipped = dates.filter(d =>
+      schedules.some(s =>
+        s.date === d &&
+        s.studioId === rule.studioId &&
+        s.status !== 'cancelled' &&
+        ((s.startTime <= rule.startTime && s.endTime > rule.startTime) ||
+          (s.startTime < rule.endTime && s.endTime >= rule.endTime))
+      )
+    ).length;
+    const expected = dates.length - skipped;
+
+    let content = `📋 计划生成：${dates.length} 节`;
+    if (skipped > 0) {
+      content += `\n⛔ 跳过冲突：${skipped} 节`;
+    }
+    content += `\n✅ 实际新增：${expected} 节`;
+
     Taro.showModal({
       title: '批量生成排期',
-      content: `将根据规则「${rule.name}」生成 ${dates.length} 节课程排期（${rule.startDate} 起，共 ${rule.weeksCount} 周）。是否继续？`,
+      content,
       confirmText: '确认生成',
       success: (res) => {
         if (res.confirm) {
           Taro.showLoading({ title: '生成中...' });
           setTimeout(() => {
-            const newSchedules: Schedule[] = dates.map((dateStr, idx) => {
-              const seqNum = (scheduleIdSeq || 100) + idx + 1;
+            const nonConflictDates = dates.filter(d =>
+              !schedules.some(s =>
+                s.date === d &&
+                s.studioId === rule.studioId &&
+                s.status !== 'cancelled' &&
+                ((s.startTime <= rule.startTime && s.endTime > rule.startTime) ||
+                  (s.startTime < rule.endTime && s.endTime >= rule.endTime))
+              )
+            );
+            const newSchedules: Schedule[] = nonConflictDates.map((dateStr, idx) => {
+              const seqNum = scheduleIdSeq + idx + 1;
               return {
                 id: `sch${String(seqNum).padStart(3, '0')}`,
                 title: rule.name.split('·')[0] || getCourseTypeName(rule.courseType) + '课',
@@ -97,12 +124,9 @@ const SchedulePage: React.FC = () => {
               } as Schedule;
             });
             const added = addSchedules(newSchedules);
-            if (newSchedules.length > 0) {
-              updateIdSeq({ scheduleIdSeq: (scheduleIdSeq || 100) + newSchedules.length });
-            }
             Taro.hideLoading();
             Taro.showToast({
-              title: `已生成 ${added} 节排课`,
+              title: `✅ 实际新增 ${added} 节`,
               icon: 'success'
             });
             setActiveTab('schedule');
@@ -220,6 +244,20 @@ const SchedulePage: React.FC = () => {
                 <Text className={styles.titleIcon}>📅</Text>
                 课程排期
               </Text>
+              <View
+                style={{
+                  padding: '8rpx 20rpx',
+                  borderRadius: '48rpx',
+                  background: showCancelled ? '#FFF0F0' : '#F2F3F5',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+                onClick={() => setShowCancelled(!showCancelled)}
+              >
+                <Text style={{ fontSize: 22, color: showCancelled ? '#FF3B30' : '#86909C' }}>
+                  {showCancelled ? '隐藏已取消' : '显示已取消'}
+                </Text>
+              </View>
             </View>
             <ScrollView className={styles.filterBar} scrollX enhanced showScrollbar={false}>
               {courseFilters.map(f => (

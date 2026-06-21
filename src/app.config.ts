@@ -9,7 +9,8 @@ export default defineAppConfig({
     'pages/schedule-detail/index',
     'pages/match-detail/index',
     'pages/artwork-detail/index',
-    'pages/cycle-config/index'
+    'pages/cycle-config/index',
+    'pages/artwork-upload/index'
   ],
   window: {
     backgroundTextStyle: 'light',

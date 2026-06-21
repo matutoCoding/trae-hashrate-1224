@@ -45,8 +45,10 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ schedule, showDate = true, 
     }
   };
 
+  const isCancelled = schedule.status === 'cancelled';
+
   return (
-    <View className={styles.card} onClick={handleClick}>
+    <View className={classnames(styles.card, isCancelled && styles.cardCancelled)} onClick={handleClick}>
       <View className={styles.timeCol}>
         <Text className={styles.time}>{schedule.startTime}</Text>
         <View className={styles.timeLine} />
@@ -67,7 +69,7 @@ const ScheduleItem: React.FC<ScheduleItemProps> = ({ schedule, showDate = true, 
             </Text>
           )}
         </View>
-        <Text className={styles.title}>{schedule.title}</Text>
+        <Text className={classnames(styles.title, isCancelled && styles.titleCancelled)}>{schedule.title}</Text>
         <View className={styles.infoRow}>
           <View className={styles.infoItem}>
             <Text className={styles.infoIcon}>🏫</Text>

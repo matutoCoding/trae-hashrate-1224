@@ -119,6 +119,18 @@ const ScheduleDetailPage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      {schedule.status === 'cancelled' && (
+        <View style={{
+          background: '#FFF0F0',
+          padding: '16rpx 32rpx',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8
+        }}>
+          <Text style={{ fontSize: 28 }}>⚠️</Text>
+          <Text style={{ fontSize: 26, color: '#FF3B30', fontWeight: 600 }}>此课程已取消</Text>
+        </View>
+      )}
       <View className={styles.headerCard}>
         <View className={styles.headerTop}>
           <Text className={styles.courseBadge}>🎨 {getCourseTypeName(schedule.courseType)}</Text>
